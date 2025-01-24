@@ -17,6 +17,9 @@ def save_classifier(classifier, vectorizer):
     return
 
 def load_classifier():
+    if not os.path.exists('model/classifier.pkl'):
+        print("--> model/classifier.pkl and model/vectorizer.pkl do not exist. Retraining classifier...")
+        return retrain_classifier()
     classifier = joblib.load('model/classifier.pkl')
     vectorizer = joblib.load('model/vectorizer.pkl')
     return classifier, vectorizer

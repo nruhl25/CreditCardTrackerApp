@@ -2,7 +2,7 @@ RawStatements/
 StatementsToProcess/
 build/
 dist/
-data/
+data/*
 testing/
 .spec
 .DS_Store

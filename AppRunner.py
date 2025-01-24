@@ -33,9 +33,9 @@ class ScriptRunnerApp:
 
         self.script2_frame = tk.Frame(master)
         self.script2_frame.pack()
-        self.script2_button = tk.Button(self.script2_frame, text="retrain_classifier()", command=self.run_script2)
+        self.script2_button = tk.Button(self.script2_frame, text="train_classifier()", command=self.run_script2)
         self.script2_button.grid(row=0, column=0)
-        self.script2_desc_label = tk.Label(self.script2_frame, text="Re-train SVM classifier if changes were made to VendorID files")
+        self.script2_desc_label = tk.Label(self.script2_frame, text="(Re)-train SVM classifier if changes were made to VendorID files")
         self.script2_desc_label.grid(row=0, column=1)
 
         if len(os.listdir('data/RawStatements/'))>0:
