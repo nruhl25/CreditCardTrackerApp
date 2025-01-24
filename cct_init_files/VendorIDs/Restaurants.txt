@@ -1,0 +1,36 @@
+tst
+sq
+catering
+starbucks
+thai
+bagel
+panera
+pizza
+milkshake
+burger
+cuisine
+ihop
+java
+cafe
+coffee
+wawa
+brewing
+tocayo
+jackworth
+brueggers
+dunkin
+concessions
+vending
+bar
+tap
+pub
+beer
+wine
+tea
+spirits
+taco
+vegan
+doughnut
+hearth
+turning point
+paris baguette

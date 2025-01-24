@@ -1,0 +1,12 @@
+food
+market
+giant eagle
+trader joes
+east end food co-op
+aldi
+costco
+cvs
+pharmacy
+walgreens
+rite aid
+target
