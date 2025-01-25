@@ -18,5 +18,6 @@ The Credit Card Tracker App is a comprehensive tool designed to help users manag
     - An example of the "raw statement file format is given in `data/RawStatements/Credit Card - 08-01-2023_12-31-2023.csv`.
 4. **Analyze Spending**: Let the Bag-Of-Words model automatically categorize your credit card statements. You can view and make corrections to the auto-categories in the folder `model/CorrectedStatements/`. Feel free to remove "TO_BE_CORRECTED" from the file names once they have been corrected.
     - An exemple of the "to-be corrected" excel file format is given in `data/CorrectedStatements/TO_BE_CORRECTED_08-01-2023_12-31-2023.csv`
-5. **Manage Budgets**: Perform your own post-processing of your spending data in `data/all_transactions.csv` and `data/monthly_summary.xlsx`
+5. **Manage Budgets**: Perform your own post-processing of your spending data in `data/all_transactions.csv` and `data/monthly_summary.csv`. Note that these files will be written over and added to the next time you run the app, so be careful to do your post-processing in a file named something slighlty different.
+    - It was decided to re-process everything and re-write the file every time, but this could be changed in future versions.
 6. **Customize Functionality**: If you want the auto-categorizer to clue-in on stores or key phrases when categorizing your expenses, you can modify the text files in `cct_init_files/VendorIDs/`

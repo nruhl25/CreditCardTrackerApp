@@ -12,7 +12,6 @@ def calculate_category_totals(transactions_df: pd.DataFrame):
     for category in categories:
         total_expenses_dict[category] = 0.0
 
-    # Already passing in a subset corresponding to the month and year
     # Alternative method:
     # my_transactions_df = transactions_df[(transactions_df['Transaction_Date'].dt.month == month) & (transactions_df['Transaction_Date'].dt.year == year)]
 
@@ -42,8 +41,8 @@ def summarize_monthly_transactions():
     monthly_df = pd.DataFrame(monthly_summary_dicts)
 
     # Display the result
-    monthly_df.to_excel("data/monthly_summary.xlsx", index=False)
-
+    monthly_df.to_csv("data/monthly_summary.csv", index=False)
+    print("--> data/monthly_summary.csv has been written.")
     return
 
 

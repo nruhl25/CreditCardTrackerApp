@@ -8,7 +8,7 @@ from categorize_raw_statement import categorize_last_raw_statement, tell_user_ne
 from compile_corrected_statements import compile_corrected_statements
 from summarize_transactions import summarize_monthly_transactions
 
-cct_version = '3.0'
+cct_version = '3.1'
 
 class ScriptRunnerApp:
     def __init__(self, master):
@@ -51,7 +51,7 @@ class ScriptRunnerApp:
 
         self.script4_frame = tk.Frame(master)
         self.script4_frame.pack()
-        self.script4_button = tk.Button(self.script4_frame, text="compile and summarize_transactions.py", command=self.run_script4)
+        self.script4_button = tk.Button(self.script4_frame, text="compile and summarize_transactions()", command=self.run_script4)
         self.script4_button.grid(row=0, column=0)
         self.script4_desc_label = tk.Label(self.script4_frame, text="Read and summarize 'CorrectedStatements' for all data")
         self.script4_desc_label.grid(row=1, column=0, columnspan=3)

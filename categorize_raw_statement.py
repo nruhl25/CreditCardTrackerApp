@@ -71,6 +71,7 @@ def categorize_raw_statement(statement_fn):
 def tell_user_next_statement_start():
     '''This function tells the user the start date of the next statement to download'''
     all_statements_fn = os.listdir("data/RawStatements")
+    all_statements_fn.remove(".DS_Store")
 
     end_date_objects = []
     for statement_fn in all_statements_fn:
