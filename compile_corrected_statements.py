@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import math
 import sys
 
 from tools import load_unique_categories
@@ -9,11 +8,12 @@ def compile_corrected_statements():
     '''This function compiles all xlsx files in CorrectedStatements/, applies the user-entered corrections, and write a file data/all_transactions.csv'''
     corrected_df_list = []
     corrected_statements = os.listdir("data/CorrectedStatements")
+    corrected_statements.remove(".DS_Store")
 
     if len(corrected_statements) == 0:
         print("data/CorrectedStatements is empty. You must download and categorize a credit card statement...")
         return
-    
+
     for statement_fn in corrected_statements:
         if "TO_BE_CORRECTED" in statement_fn:
             print(f"--> WARNING: User may not have corrected data/CorrectedStatements/{statement_fn}. Proceeding using the auto-categories...")
@@ -23,8 +23,9 @@ def compile_corrected_statements():
     all_corrected_dfs = pd.concat(corrected_df_list)
 
     category_with_fix_list = []
+    all_corrected_dfs.Category_Fix_USER_ENTERED = all_corrected_dfs.Category_Fix_USER_ENTERED.astype(str)
     for transaction_id, row in all_corrected_dfs.iterrows():
-        if math.isnan(row.Category_Fix_USER_ENTERED):
+        if row.Category_Fix_USER_ENTERED == "nan":
             category_with_fix_list.append(row.Auto_Category)
         else:
             category_with_fix_list.append(row.Category_Fix_USER_ENTERED)

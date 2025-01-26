@@ -40,7 +40,8 @@ def summarize_monthly_transactions():
     # Convert the list of monthly summaries into a new DataFrame
     monthly_df = pd.DataFrame(monthly_summary_dicts)
 
-    # Display the result
+    # Display the results
+    monthly_df["Year-Month"] = monthly_df["Year"].astype(str) + "-" + monthly_df["Month"].astype(str).str.zfill(2)
     monthly_df.to_csv("data/monthly_summary.csv", index=False)
     print("--> data/monthly_summary.csv has been written.")
     return

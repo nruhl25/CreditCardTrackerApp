@@ -3,6 +3,7 @@ StatementsToProcess/
 build/
 dist/
 testing/
+/*.spec
 .spec
 .DS_Store
 */.DS_Store

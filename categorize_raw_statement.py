@@ -90,7 +90,7 @@ def tell_user_next_statement_start():
 
 def categorize_last_raw_statement():
     all_statements_fn = os.listdir("data/RawStatements")
-
+    all_statements_fn.remove(".DS_Store")
     if len(all_statements_fn) == 0:
         print("--> User must put a credit card statement in data/RawStatements...")
         return
