@@ -8,7 +8,7 @@ from categorize_raw_statement import categorize_last_raw_statement, tell_user_ne
 from compile_corrected_statements import compile_corrected_statements
 from summarize_transactions import summarize_monthly_transactions
 
-cct_version = '3.3_streamlit'
+cct_version = '3.4'
 
 class ScriptRunnerApp:
     def __init__(self, master):
