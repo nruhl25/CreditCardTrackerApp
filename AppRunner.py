@@ -8,7 +8,7 @@ from categorize_raw_statement import categorize_last_raw_statement, tell_user_ne
 from compile_corrected_statements import compile_corrected_statements
 from summarize_transactions import summarize_monthly_transactions
 
-cct_version = '3.3_working'
+cct_version = '3.3_streamlit'
 
 class ScriptRunnerApp:
     def __init__(self, master):
@@ -31,30 +31,30 @@ class ScriptRunnerApp:
         self.label = tk.Label(master, text="Select what the app should do: ")
         self.label.pack()
 
-        self.script2_frame = tk.Frame(master)
-        self.script2_frame.pack()
-        self.script2_button = tk.Button(self.script2_frame, text="train_classifier()", command=self.run_script2)
-        self.script2_button.grid(row=0, column=0)
-        self.script2_desc_label = tk.Label(self.script2_frame, text="(Re)-train SVM classifier if changes were made to VendorID files")
-        self.script2_desc_label.grid(row=0, column=1)
+        self.retrain_func_frame = tk.Frame(master)
+        self.retrain_func_frame.pack()
+        self.retrain_func_button = tk.Button(self.retrain_func_frame, text="train_classifier()", command=self.run_retrain_func)
+        self.retrain_func_button.grid(row=0, column=0)
+        self.retrain_func_desc_label = tk.Label(self.retrain_func_frame, text="(Re)-train SVM classifier if changes were made to VendorID files")
+        self.retrain_func_desc_label.grid(row=0, column=1)
 
         if len(os.listdir('data/RawStatements/'))>0:
             next_statement_date_str = tell_user_next_statement_start()
         else:
             next_statement_date_str = 'any date'
-        self.script3_frame = tk.Frame(master)
-        self.script3_frame.pack()
-        self.script3_button = tk.Button(self.script3_frame, text="categorize_last_raw_statement()", command=self.run_script3)
-        self.script3_button.grid(row=1, column=0)
-        self.script3_desc_label = tk.Label(self.script3_frame, text=f"Read and auto-categorize the most recent 'RawStatement' (Download the transactions starting on {next_statement_date_str})")
-        self.script3_desc_label.grid(row=0, column=0)
+        self.categorize_func_frame = tk.Frame(master)
+        self.categorize_func_frame.pack()
+        self.categorize_func_button = tk.Button(self.categorize_func_frame, text="categorize_last_raw_statement()", command=self.run_categorize_func)
+        self.categorize_func_button.grid(row=1, column=0)
+        self.categorize_func_desc_label = tk.Label(self.categorize_func_frame, text=f"Read and auto-categorize the most recent 'RawStatement' (Download the transactions starting on {next_statement_date_str})")
+        self.categorize_func_desc_label.grid(row=0, column=0)
 
-        self.script4_frame = tk.Frame(master)
-        self.script4_frame.pack()
-        self.script4_button = tk.Button(self.script4_frame, text="compile and summarize_transactions()", command=self.run_script4)
-        self.script4_button.grid(row=0, column=0)
-        self.script4_desc_label = tk.Label(self.script4_frame, text="Read and summarize 'CorrectedStatements' for all data")
-        self.script4_desc_label.grid(row=1, column=0, columnspan=3)
+        self.summarize_func_frame = tk.Frame(master)
+        self.summarize_func_frame.pack()
+        self.summarize_func_button = tk.Button(self.summarize_func_frame, text="compile_and_summarize_transactions()", command=self.run_summarize_func)
+        self.summarize_func_button.grid(row=0, column=0)
+        self.summarize_func_desc_label = tk.Label(self.summarize_func_frame, text="Read and summarize 'CorrectedStatements' for all data")
+        self.summarize_func_desc_label.grid(row=1, column=0, columnspan=3)
 
         self.quit_button = tk.Button(master, text="Quit", command=master.quit)
         self.quit_button.pack()
@@ -68,13 +68,13 @@ class ScriptRunnerApp:
         print('--> Installation is complete. The GUI should have opened in another tab..')
         return
 
-    def run_script2(self):
+    def run_retrain_func(self):
         retrain_classifier()
 
-    def run_script3(self):
+    def run_categorize_func(self):
         categorize_last_raw_statement()
 
-    def run_script4(self):
+    def run_summarize_func(self):
         compile_corrected_statements()
         summarize_monthly_transactions()
 

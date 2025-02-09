@@ -110,6 +110,16 @@ def categorize_last_raw_statement():
 
     most_recent_index = np.argmax(end_date_objects)
     statement_to_classify_fn = all_statements_fn[most_recent_index]
+
+    corresponding_corrected_fn = re.sub('.csv$','.xlsx',statement_to_classify_fn)
+    corresponding_corrected_fn = re.sub('Credit Card - \d{4}_', '', corresponding_corrected_fn)
+
+    if corresponding_corrected_fn in os.listdir('data/CorrectedStatements'):
+        print(f"--> data/CorrectedStatements/{corresponding_corrected_fn} already exists. Skipping auto-classification.")
+        return
+    elif "TO_BE_CORRECTED_"+corresponding_corrected_fn in os.listdir('data/CorrectedStatements'):
+        print(f"--> Warning: data/CorrectedStatements/TO_BE_CORRECTED_{corresponding_corrected_fn} exists. Re-classifying the statement.")
+
     print(f"--> Program is auto-classifying {statement_to_classify_fn}.")
 
     recent_start_date = start_date_objects[most_recent_index]
