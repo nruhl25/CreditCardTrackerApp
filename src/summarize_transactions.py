@@ -49,7 +49,7 @@ def summarize_monthly_transactions():
     monthly_df["Year-Month"] = monthly_df["Year"].astype(str) + "-" + monthly_df["Month"].astype(str).str.zfill(2)
     monthly_df.set_index("Year-Month", inplace=True)
     monthly_df.to_csv("data/monthly_summary.csv")
-    print("--> data/monthly_summary.csv has been written.")
+    print("--> data/monthly_summary.csv has been written")
     return
 
 

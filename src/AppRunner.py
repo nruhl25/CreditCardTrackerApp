@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import argparse
 
 # Custom python modules / functions
 from categorize_raw_statement import categorize_all_raw_statements, tell_user_next_statement_start
@@ -13,6 +14,10 @@ cct_version = '3.5'
 src_dir = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == '__main__':
+    args = argparse.ArgumentParser(description='Credit Card Tracker')
+    args.add_argument('-s', '--streamlit', action='store_true', help="Run  Streamlit app", default=False)
+    args = args.parse_args()
+
     print('\n')
     print(f"**********************************************")
     print(f"********** Credit Card Tracker v{cct_version} **********")
@@ -44,4 +49,8 @@ if __name__ == '__main__':
     print("--------------------------------")
 
     # Run the streamlit app
-    # subprocess.run(f'streamlit run {src_dir}/StreamlitApp.py', shell=True)
+    if args.streamlit is True:
+        print('\n')
+        print("********** Running Streamlit App ************")
+        print('\n')
+        subprocess.run(f'streamlit run {src_dir}/StreamlitApp.py', shell=True)

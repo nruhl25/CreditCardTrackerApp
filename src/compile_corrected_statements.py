@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import sys
+from natsort import natsorted
 
 from tools import load_unique_categories, load_classifier
 
@@ -16,12 +17,14 @@ def compile_corrected_statements():
         return
 
     for statement_fn in corrected_statements:
-        if "TO_BE_CORRECTED" in statement_fn:
-            print(f"--> WARNING: User may not have corrected data/CorrectedStatements/{statement_fn}. Proceeding using the auto-categories...")
         corrected_df = pd.read_excel(f"data/CorrectedStatements/{statement_fn}")
+        corrected_df.set_index("Transaction_ID", inplace=True)
         corrected_df_list.append(corrected_df)
 
     all_corrected_dfs = pd.concat(corrected_df_list)
+
+    # Sort the dataframe by index
+    all_corrected_dfs = all_corrected_dfs.loc[natsorted(all_corrected_dfs.index)]
 
     category_with_fix_list = []
     all_corrected_dfs.Category_Fix_USER_ENTERED = all_corrected_dfs.Category_Fix_USER_ENTERED.astype(str)
@@ -36,10 +39,11 @@ def compile_corrected_statements():
                 print("--> Exiting the program...")
                 sys.exit()
     
-    all_corrected_dfs = all_corrected_dfs[["Transaction_Date", "Vendor_Name", "Amount"]]
+    all_corrected_dfs = all_corrected_dfs[[ "Transaction_Date", "Vendor_Name", "Amount"]]
     all_corrected_dfs["Category"] = category_with_fix_list
 
     all_corrected_dfs.to_csv("data/all_transactions.csv")
+    print(f"--> data/all_transactions.csv has been written")
     return
 
 # Not currently used, but keeping for reference

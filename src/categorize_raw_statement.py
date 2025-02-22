@@ -97,27 +97,33 @@ def categorize_all_raw_statements():
     # Auto-classify all raw statements
 
     transaction_id = 1  # will increment for each transaction
+    counter = 0
     for raw_statement_fn in all_raw_statements_fn:
+        counter += 1
         previously_classified = False
         corrected_statement_fn = re.sub('.csv$','.xlsx',raw_statement_fn)
 
         # Check if the program has already classified this statement, in which case the user might have made modifications
         if corrected_statement_fn in os.listdir("data/CorrectedStatements"):
             previously_classified = True
-            existing_corrected_df = pd.read_excel(f"data/CorrectedStatements/{corrected_statement_fn}")
-            existing_corrected_df.set_index('Transaction_ID', inplace=True)
 
-        print(f"--> Program is auto-classifying {raw_statement_fn}.")
         auto_classified_df = categorize_raw_statement(raw_statement_fn)
+
+        # Create the index Transaction_ID column
+        auto_classified_df['Transaction_ID'] = range(transaction_id, transaction_id + len(auto_classified_df))
+        auto_classified_df.set_index('Transaction_ID', inplace=True)
 
         # User might have made changes... keep their changes
         if previously_classified:
-            auto_classified_df['Category_Fix_USER_ENTERED'] = existing_corrected_df['Category_Fix_USER_ENTERED']
+            existing_corrected_df = pd.read_excel(f"data/CorrectedStatements/{corrected_statement_fn}")
+            existing_corrected_df.set_index('Transaction_ID', inplace=True)
+            # Want to copy over the info that the user could have enter in the "existing_df" into the new auto_classified_df
+            auto_classified_df = auto_classified_df.reindex_like(existing_corrected_df)
+            cols_to_copy = list(existing_corrected_df.columns)
+            auto_classified_df[cols_to_copy] = existing_corrected_df[cols_to_copy]
 
-        auto_classified_df['Transaction_ID'] = range(transaction_id, transaction_id + len(auto_classified_df))
-        auto_classified_df.set_index('Transaction_ID', inplace=True)
         auto_classified_df.to_excel(f"data/CorrectedStatements/{corrected_statement_fn}")
-        print(f"--> data/CorrectedStatements/{raw_statement_fn} has been written/updated")
+        print(f"--> data/CorrectedStatements/{corrected_statement_fn} has been written/updated ({counter}/{len(all_raw_statements_fn)})")
         transaction_id += len(auto_classified_df)
 
     return
