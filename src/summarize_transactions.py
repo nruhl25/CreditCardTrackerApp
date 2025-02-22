@@ -6,7 +6,7 @@ import os
 from tools import load_unique_categories
 
 def calculate_category_totals(transactions_df: pd.DataFrame):
-    '''tranactions_df is a subset of the total transactions data frame'''
+    '''transactions_df is a subset of the total transactions data frame'''
     # Initialize total_expense_dict, key=categories, values=total expense
     categories = load_unique_categories()
     total_expenses_dict = {}
@@ -50,7 +50,6 @@ def summarize_monthly_transactions():
     monthly_df.set_index("Year-Month", inplace=True)
     monthly_df.to_csv("data/monthly_summary.csv")
     print("--> data/monthly_summary.csv has been written.")
-    # To-do.. maybe add the first and last date of the month to the file name?
     return
 
 

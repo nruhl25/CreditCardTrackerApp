@@ -2,10 +2,10 @@ import os
 import pandas as pd
 import sys
 
-from tools import load_unique_categories
+from tools import load_unique_categories, load_classifier
 
 def compile_corrected_statements():
-    '''This function compiles all xlsx files in CorrectedStatements/, applies the user-entered corrections, and write a file data/all_transactions.csv'''
+    '''This function compiles all .xlsx files in CorrectedStatements/, applies the user-entered corrections, and write a file data/all_transactions.csv'''
     corrected_df_list = []
     corrected_statements = os.listdir("data/CorrectedStatements")
     if ".DS_Store" in corrected_statements:
@@ -42,5 +42,17 @@ def compile_corrected_statements():
     all_corrected_dfs.to_csv("data/all_transactions.csv")
     return
 
-if __name__ == "__main__":
-    compile_corrected_statements()
+# Not currently used, but keeping for reference
+def reclassify_corrected_statement(statement_fn):
+    ''' User has modified their classifier, and all "Corrected Statements need to be re-classified. This function modifies the "Auto-Category" '''
+    new_auto_categories = []
+    corrected_statement_df = pd.read_excel(f"data/CorrectedStatements/{statement_fn}")
+    svm_classifier, vectorizer = load_classifier()
+    for index, row in corrected_statement_df.iterrows():
+        X_test = row.Inferred_Vendor_ID
+        X_test_vector = vectorizer.transform([X_test])
+        new_auto_categories.append(svm_classifier.predict(X_test_vector)[0])
+    corrected_statement_df["Auto_Category"] = new_auto_categories
+    corrected_statement_df.to_excel(f"data/CorrectedStatements/{statement_fn}")
+    print(f"--> data/CorrectedStatements/{statement_fn} has been re-classified")
+    return

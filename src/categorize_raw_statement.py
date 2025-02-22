@@ -2,37 +2,10 @@ import pandas as pd
 import os
 import re
 import numpy as np
+import sys
 from datetime import datetime, timedelta
-import joblib
 
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn import svm
-
-from tools import load_vendorIDs_and_labels, convert_vendorName_to_vendorID
-
-def save_classifier(classifier, vectorizer):
-    joblib.dump(classifier, 'model/classifier.pkl')
-    joblib.dump(vectorizer, 'model/vectorizer.pkl')
-    print("--> model/classifier.pkl and model/vectorizer.pkl have been written.")
-    return
-
-def load_classifier():
-    if not os.path.exists('model/classifier.pkl'):
-        print("--> model/classifier.pkl and model/vectorizer.pkl do not exist. Retraining classifier...")
-        return retrain_classifier()
-    classifier = joblib.load('model/classifier.pkl')
-    vectorizer = joblib.load('model/vectorizer.pkl')
-    return classifier, vectorizer
-
-def retrain_classifier():
-    '''Re-train classifier every time the user opens up the GUI'''
-    X_train, y_train = load_vendorIDs_and_labels()
-    vectorizer = CountVectorizer(binary=True)
-    X_train_vectors = vectorizer.fit_transform(X_train)
-    svm_classifier = svm.SVC(kernel='linear')
-    svm_classifier.fit(X_train_vectors, y_train)
-    save_classifier(svm_classifier, vectorizer)
-    return svm_classifier, vectorizer
+from tools import convert_vendorName_to_vendorID, load_classifier
 
 
 def categorize_raw_statement(statement_fn):
@@ -42,7 +15,6 @@ def categorize_raw_statement(statement_fn):
     
     # Create a guess auto-category with the ML model
     guessed_dict = {}
-    guessed_dict['Transaction_ID'] = []
     guessed_dict['Transaction_Date'] = []
     guessed_dict['Vendor_Name'] = []
     guessed_dict['Inferred_Vendor_ID'] = []
@@ -55,7 +27,6 @@ def categorize_raw_statement(statement_fn):
             # Credit card payment or re-fund
             continue
 
-        guessed_dict['Transaction_ID'].append(expense_id)
         guessed_dict['Transaction_Date'].append(row.Date)
         guessed_dict['Vendor_Name'].append(row.Name.strip())
         X_test = convert_vendorName_to_vendorID(row.Name.lower().strip())
@@ -76,7 +47,7 @@ def tell_user_next_statement_start():
 
     end_date_objects = []
     for statement_fn in all_statements_fn:
-        match = re.findall(r'_(\d{2}-\d{2}-\d{4})_(\d{2}-\d{2}-\d{4}).csv', statement_fn)
+        match = re.findall(r'(\d{2}-\d{2}-\d{4})_(\d{2}-\d{2}-\d{4}).csv', statement_fn)
         if match:
             end_date_str = match[0][1]
             
@@ -89,15 +60,80 @@ def tell_user_next_statement_start():
     next_start_date_str = next_start_date_object.strftime("%m-%d-%Y")
     return next_start_date_str
 
-def categorize_last_raw_statement():
+def sort_statement_fns_by_date(unsorted_statement_fns):
+    start_date_objects = []
+    end_date_objects = []
+    for statement_fn in unsorted_statement_fns:
+        match = re.findall(r'(\d{2}-\d{2}-\d{4})_(\d{2}-\d{2}-\d{4}).csv', statement_fn)
+        if match:
+            start_date_str = match[0][0]
+            end_date_str = match[0][1]
+            
+            start_date_objects.append(datetime.strptime(start_date_str, "%m-%d-%Y"))
+            end_date_objects.append(datetime.strptime(end_date_str, "%m-%d-%Y"))
+        else:
+            print(f"WARNING: data/RawStatements/{statement_fn} is in the wrong format")
+
+    sorted_indices = np.argsort(start_date_objects)
+
+    sorted_statement_fns = [unsorted_statement_fns[i] for i in sorted_indices]
+
+    return sorted_statement_fns
+
+
+def categorize_all_raw_statements():
+    '''Function to auto-classify all raw statements and write/modify the corresponding corrected statement'''
+    all_raw_statements_fn = os.listdir("data/RawStatements")
+    if ".DS_Store" in all_raw_statements_fn:
+        all_raw_statements_fn.remove(".DS_Store")
+
+    if len(all_raw_statements_fn) == 0:
+        print("--> User must put a credit card statement in data/RawStatements...")
+        sys.exit()
+
+    # Sort the statement file names by date
+    all_raw_statements_fn = sort_statement_fns_by_date(all_raw_statements_fn)
+
+    # Auto-classify all raw statements
+
+    transaction_id = 1  # will increment for each transaction
+    for raw_statement_fn in all_raw_statements_fn:
+        previously_classified = False
+        corrected_statement_fn = re.sub('.csv$','.xlsx',raw_statement_fn)
+
+        # Check if the program has already classified this statement, in which case the user might have made modifications
+        if corrected_statement_fn in os.listdir("data/CorrectedStatements"):
+            previously_classified = True
+            existing_corrected_df = pd.read_excel(f"data/CorrectedStatements/{corrected_statement_fn}")
+            existing_corrected_df.set_index('Transaction_ID', inplace=True)
+
+        print(f"--> Program is auto-classifying {raw_statement_fn}.")
+        auto_classified_df = categorize_raw_statement(raw_statement_fn)
+
+        # User might have made changes... keep their changes
+        if previously_classified:
+            auto_classified_df['Category_Fix_USER_ENTERED'] = existing_corrected_df['Category_Fix_USER_ENTERED']
+
+        auto_classified_df['Transaction_ID'] = range(transaction_id, transaction_id + len(auto_classified_df))
+        auto_classified_df.set_index('Transaction_ID', inplace=True)
+        auto_classified_df.to_excel(f"data/CorrectedStatements/{corrected_statement_fn}")
+        print(f"--> data/CorrectedStatements/{raw_statement_fn} has been written/updated")
+        transaction_id += len(auto_classified_df)
+
+    return
+
+# Below function is not currently used, but could be used in the future
+def identify_recent_raw_statement_to_classify():
+    '''Function to use when the user wants to classify a specific statement rather than all RawStatemnts.
+    Return: file name of raw statement to classify (str)'''
     all_statements_fn = os.listdir("data/RawStatements")
     if ".DS_Store" in all_statements_fn:
         all_statements_fn.remove(".DS_Store")
 
     if len(all_statements_fn) == 0:
         print("--> User must put a credit card statement in data/RawStatements...")
-        return
-
+        sys.exit()
+    
     start_date_objects = []
     end_date_objects = []
     for statement_fn in all_statements_fn:
@@ -114,29 +150,9 @@ def categorize_last_raw_statement():
     most_recent_index = np.argmax(end_date_objects)
     statement_to_classify_fn = all_statements_fn[most_recent_index]
 
-    corresponding_corrected_fn = re.sub('.csv$','.xlsx',statement_to_classify_fn)
-    corresponding_corrected_fn = re.sub('Credit Card - \d{4}_', '', corresponding_corrected_fn)
-
-    if corresponding_corrected_fn in os.listdir('data/CorrectedStatements'):
-        print(f"--> data/CorrectedStatements/{corresponding_corrected_fn} already exists. Skipping auto-classification.")
-        return
-    elif "TO_BE_CORRECTED_"+corresponding_corrected_fn in os.listdir('data/CorrectedStatements'):
-        print(f"--> Warning: data/CorrectedStatements/TO_BE_CORRECTED_{corresponding_corrected_fn} already exists. Skipping auto-classification.")
-        return
-
-    print(f"--> Program is auto-classifying {statement_to_classify_fn}.")
-
     recent_start_date = start_date_objects[most_recent_index]
     recent_end_date = end_date_objects[most_recent_index]
     recent_start_date_str = recent_start_date.strftime("%m-%d-%Y")
     recent_end_date_str = recent_end_date.strftime("%m-%d-%Y")
 
-    # Auto-classify the most recent statement
-    auto_classified_df = categorize_raw_statement(statement_to_classify_fn)
-    auto_classified_df.to_excel(f"data/CorrectedStatements/TO_BE_CORRECTED_{recent_start_date_str}_{recent_end_date_str}.xlsx", index=False)
-    print(f"-->data/CorrectedStatements/TO_BE_CORRECTED_{recent_start_date_str}_{recent_end_date_str}.xlsx has been written and is ready to be edited.")
-    return
-
-
-if __name__ == '__main__':
-    categorize_last_raw_statement()
+    return statement_to_classify_fn

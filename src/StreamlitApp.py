@@ -4,7 +4,10 @@ import matplotlib.pyplot as plt
 
 def streamlit_app():
     '''Main function for the Streamlit App'''
+
     st.title('Data Visualization Tool for the CreditCardTrackerApp')
+
+    st.image("cct_init_files/piggybank.png")
 
     df = pd.read_csv('data/monthly_summary.csv')
     df.set_index('Year-Month', inplace=True)
