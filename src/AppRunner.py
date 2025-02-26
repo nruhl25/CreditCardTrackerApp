@@ -45,6 +45,8 @@ if __name__ == '__main__':
         next_statement_date_str = tell_user_next_statement_start()
     else:
         next_statement_date_str = 'any date'
+    
+    print("--------------------------------")
     print(f"Next RawStatement to download: start date = {next_statement_date_str}")
     print("--------------------------------")
 
