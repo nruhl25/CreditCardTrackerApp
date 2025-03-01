@@ -2,6 +2,8 @@
 
 The Credit Card Tracker App is a comprehensive tool designed to help users manage and track their credit card expenses efficiently. This application provides features such as expense categorization, spending analysis, and budget management to ensure users have a clear understanding of their financial activities.
 
+![alt text](cct_init_files/piggybank.png)
+
 ## Features
 
 - **Expense Categorization**: Automatically categorize your expenses for better tracking.
