@@ -1,3 +1,3 @@
 import streamlit as st
 
-st.write("## Vendor Breakdown")
+st.write("# Vendor Breakdown")
