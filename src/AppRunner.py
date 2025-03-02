@@ -10,7 +10,7 @@ from compile_corrected_statements import compile_corrected_statements
 from summarize_transactions import summarize_monthly_transactions
 from tools import retrain_classifier, init_working_directory
 
-cct_version = '3.5'
+cct_version = '3.6'
 src_dir = os.path.dirname(os.path.abspath(__file__))
 
 if __name__ == '__main__':
